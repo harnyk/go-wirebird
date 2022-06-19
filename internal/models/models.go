@@ -1,7 +1,7 @@
 package models
 
 type ProcessData struct {
-	PID        int    `json:"pid"`
+	PID        int64  `json:"pid"`
 	Title      string `json:"title,omitempty"`
 	MainModule string `json:"mainModule,omitempty"`
 }
@@ -40,8 +40,8 @@ type ErrorData struct {
 }
 
 type LoggerEvent struct {
-	Request  RequestData  `json:"request"`
-	Response ResponseData `json:"response,omitempty"`
-	Error    ErrorData    `json:"error,omitempty"`
-	Process  ProcessData  `json:"process,omitempty"`
+	Request  RequestData   `json:"request"`
+	Response *ResponseData `json:"response,omitempty"`
+	Error    *ErrorData    `json:"error,omitempty"`
+	Process  *ProcessData  `json:"process,omitempty"`
 }

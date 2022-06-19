@@ -7,6 +7,10 @@ tasks:
       - task: generate_ts
       - task: generate_schema
 
+  test:
+    cmds:
+      - go test -v ./...
+
   generate_ts:
     cmds:
       - go run ./cmd/gents -o internal/generated/types.ts

@@ -1,0 +1,26 @@
+version: '3'
+
+tasks:
+  
+  dev:
+    cmds:
+      - task: generate_ts
+      - task: generate_schema
+
+  generate_ts:
+    cmds:
+      - go run ./cmd/gents -o internal/generated/types.ts
+    sources:
+      - internal/models/*.go
+    generates:
+      - internal/generated/types.ts
+
+
+  generate_schema:
+    cmds:
+      - go run ./cmd/genschemas -o internal/generated/LoggerEvent.schema.json
+    sources:
+      - internal/models/*.go
+    generates:
+      - internal/generated/LoggerEvent.schema.json
+

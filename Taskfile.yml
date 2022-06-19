@@ -7,6 +7,10 @@ tasks:
       - task: generate_ts
       - task: generate_schema
 
+  serve:
+    cmds:
+      - go run ./cmd/server
+
   test:
     cmds:
       - go test -v ./...

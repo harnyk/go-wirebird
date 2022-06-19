@@ -27,7 +27,7 @@
         },
         "pid": {
           "type": "integer",
-          "format": "int32"
+          "format": "int64"
         },
         "title": {
           "type": "string"

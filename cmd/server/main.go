@@ -13,7 +13,8 @@ func main() {
 	wb := wirebird.New(melodyRouter)
 	appRoutes := router.New(melodyRouter, wb)
 
-	ginEngine.StaticFS("/ui", appRoutes.GetStaticFS())
+	ginEngine.StaticFileFS("/", "bundle.html", appRoutes.GetStaticFS())
+	ginEngine.StaticFS("/static", appRoutes.GetStaticFS())
 	ginEngine.POST("/api/updates", appRoutes.AddLegacyEvent)
 	ginEngine.POST("/api/v2/events", appRoutes.AddEvent)
 	ginEngine.GET("/api/v2/events-sock", appRoutes.HandleEventSocket)

@@ -18,8 +18,9 @@ import (
 var webui embed.FS
 
 type router struct {
-	melody   *melody.Melody
-	wirebird wirebird.Wirebird
+	melody     *melody.Melody
+	wirebird   wirebird.Wirebird
+	fileSystem http.FileSystem
 }
 
 func New(melody *melody.Melody, wirebird wirebird.Wirebird) Router {
@@ -68,10 +69,24 @@ func (r *router) HandleEventSocket(c *gin.Context) {
 	r.melody.HandleRequest(c.Writer, c.Request)
 }
 
+func (r *router) GetIndexHTML() http.File {
+	file, err := r.fileSystem.Open("index.html")
+	if err != nil {
+		log.Fatalf("Error getting index.html: %s", err.Error())
+	}
+	return file
+}
+
 func (r *router) GetStaticFS() http.FileSystem {
+	if r.fileSystem != nil {
+		return r.fileSystem
+	}
+
 	sub, err := fs.Sub(webui, "dist")
+
 	if err != nil {
 		log.Fatalf("Error getting static files: %s", err.Error())
 	}
-	return http.FS(sub)
+	r.fileSystem = http.FS(sub)
+	return r.fileSystem
 }

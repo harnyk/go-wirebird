@@ -69,14 +69,6 @@ func (r *router) HandleEventSocket(c *gin.Context) {
 	r.melody.HandleRequest(c.Writer, c.Request)
 }
 
-func (r *router) GetIndexHTML() http.File {
-	file, err := r.fileSystem.Open("index.html")
-	if err != nil {
-		log.Fatalf("Error getting index.html: %s", err.Error())
-	}
-	return file
-}
-
 func (r *router) GetStaticFS() http.FileSystem {
 	if r.fileSystem != nil {
 		return r.fileSystem

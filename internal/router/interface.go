@@ -11,5 +11,4 @@ type Router interface {
 	AddEvent(c *gin.Context)
 	HandleEventSocket(c *gin.Context)
 	GetStaticFS() http.FileSystem
-	GetIndexHTML() http.File
 }

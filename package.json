@@ -1,0 +1,14 @@
+{
+  "name": "go-wirebird",
+  "version": "1.0.0",
+  "repository": "https://github.com/harnyk/go-wirebird.git",
+  "license": "MIT",
+  "author": "Mark <markh@sweepbright.com>",
+  "main": "index.js",
+  "scripts": {
+    "build": "yarn esbuild --bundle internal/webui/main.ts --outfile=internal/router/dist/bundle.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.14.47"
+  }
+}

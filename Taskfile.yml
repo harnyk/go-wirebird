@@ -10,6 +10,27 @@ tasks:
   serve:
     cmds:
       - go run ./cmd/server
+    deps:
+      - build_webui
+      - copy_html
+  
+  build_webui:
+    cmds:
+      - yarn build
+    sources:
+      - ./internal/webui/**/*.*
+    generates:
+      - ./internal/router/dist/index.html
+      - ./internal/router/dist/bundle.js
+      - ./internal/router/dist/bundle.css
+  
+  copy_html:
+    cmds:
+      - cp ./internal/webui/index.html ./internal/router/dist/index.html
+    sources:
+      - ./internal/webui/index.html
+    generates:
+      - ./internal/router/dist/index.html
 
   test:
     cmds:

@@ -1,18 +1,15 @@
+import { createElement } from 'react';
+import { render } from 'react-dom';
+
 import { LoggerEvent } from '../generated/types';
+import { MainScreen } from './src/screens/main.screen';
 
 main();
 
 function main() {
-    console.log('webui started');
+    initUI();
+}
 
-    const ws = new WebSocket(`ws://${window.location.host}/api/v2/events-sock`);
-
-    ws.onopen = () => {
-        console.log('[ws] connected');
-    };
-    ws.onmessage = (event) => {
-        console.log('[ws] received message of length: ', event.data.length);
-        const parsedMessage: LoggerEvent = JSON.parse(event.data);
-        console.log('[ws] parsed message: ', parsedMessage);
-    };
+function initUI() {
+    render(createElement(MainScreen), document.getElementById('root'));
 }

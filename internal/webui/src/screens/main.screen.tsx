@@ -2,8 +2,11 @@ import React, { FC } from 'react';
 import { useEventStream } from '../hooks/useEventStream';
 
 export const MainScreen: FC = () => {
-    const { events, lookups } = useEventStream(
-        `ws://${window.location.host}/api/v2/events-sock`
+    const { events, lookups, searchResults } = useEventStream(
+        `ws://${window.location.host}/api/v2/events-sock`,
+        {
+            method: 'POST',
+        }
     );
 
     return (
@@ -15,6 +18,7 @@ export const MainScreen: FC = () => {
                 ))}
             </ul>
             <pre>{JSON.stringify([...lookups.domains], null, 2)}</pre>
+            <pre>{JSON.stringify([...searchResults], null, 2)}</pre>
         </div>
     );
 };

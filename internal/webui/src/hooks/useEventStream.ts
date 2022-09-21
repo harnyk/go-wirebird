@@ -1,4 +1,5 @@
-import { useCallback } from 'react';
+import Fuse from 'fuse.js';
+import { useCallback, useMemo, useRef } from 'react';
 import { useEffectOnce, useList, useSet } from 'react-use';
 import { LoggerEvent } from '../../../generated/types';
 
@@ -28,9 +29,71 @@ const useLookups = () => {
     };
 };
 
-export const useEventStream = (url: string) => {
+interface FilterParams {
+    domain?: string;
+    pid?: number;
+    method?: string;
+    statusCode?: number;
+}
+
+const useSearchIndex = (filter: FilterParams) => {
+    const index = useMemo(
+        () =>
+            new Fuse<LoggerEvent>([], {
+                keys: [
+                    'request.url',
+                    'request.method',
+                    'response.statusCode',
+                    'process.pid',
+                ],
+            }),
+        []
+    );
+
+    const versionRef = useRef(0);
+
+    const indexEvent = useCallback((event: LoggerEvent) => {
+        index.add(event);
+        versionRef.current++;
+    }, []);
+
+    const searchResults = useMemo(() => {
+        const { domain, pid, method, statusCode } = filter;
+
+        const expressions: Fuse.Expression[] = [];
+        if (domain) {
+            expressions.push({ 'request.url': domain });
+        }
+        if (pid) {
+            expressions.push({ 'process.pid': pid.toString() });
+        }
+        if (method) {
+            expressions.push({ 'request.method': method });
+        }
+        if (statusCode) {
+            expressions.push({ 'response.statusCode': statusCode.toString() });
+        }
+
+        const results = index.search({ $and: expressions });
+        return results.map((r) => r.item);
+    }, [
+        filter.domain,
+        filter.pid,
+        filter.method,
+        filter.statusCode,
+        versionRef.current,
+    ]);
+
+    return {
+        indexEvent,
+        searchResults,
+    };
+};
+
+export const useEventStream = (url: string, filter: FilterParams) => {
     const [events, { push }] = useList<LoggerEvent>([]);
     const { lookups, indexEvent } = useLookups();
+    const { indexEvent: indexSearch, searchResults } = useSearchIndex(filter);
 
     useEffectOnce(() => {
         const ws = new WebSocket(url);
@@ -44,6 +107,7 @@ export const useEventStream = (url: string) => {
             console.log('[ws] parsed message: ', parsedMessage);
             push(parsedMessage);
             indexEvent(parsedMessage);
+            indexSearch(parsedMessage);
         };
 
         return () => {
@@ -51,5 +115,5 @@ export const useEventStream = (url: string) => {
         };
     });
 
-    return { events, lookups };
+    return { events, searchResults, lookups };
 };

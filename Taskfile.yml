@@ -2,14 +2,35 @@ version: '3'
 
 tasks:
   
-  dev:
+  generate:
     cmds:
       - task: generate_ts
-      - task: generate_schema
 
   serve:
     cmds:
       - go run ./cmd/server
+    deps:
+      - build_webui
+      - copy_html
+  
+  build_webui:
+    cmds:
+      - yarn build
+    sources:
+      - ./internal/webui/**/*.*
+    generates:
+      - ./internal/router/dist/bundle.html
+      - ./internal/router/dist/bundle.js
+      - ./internal/router/dist/bundle.css
+  
+  copy_html:
+    cmds:
+      - mkdir -p ./internal/router/dist
+      - cp ./internal/webui/index.html ./internal/router/dist/bundle.html
+    sources:
+      - ./internal/webui/index.html
+    generates:
+      - ./internal/router/dist/bundle.html
 
   test:
     cmds:
@@ -22,13 +43,4 @@ tasks:
       - internal/models/*.go
     generates:
       - internal/generated/types.ts
-
-
-  generate_schema:
-    cmds:
-      - go run ./cmd/genschemas -o internal/generated/LoggerEvent.schema.json
-    sources:
-      - internal/models/*.go
-    generates:
-      - internal/generated/LoggerEvent.schema.json
 

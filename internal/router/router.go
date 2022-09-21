@@ -1,6 +1,8 @@
 package router
 
 import (
+	"embed"
+	"io/fs"
 	"log"
 	"net/http"
 
@@ -12,9 +14,13 @@ import (
 	"gopkg.in/olahol/melody.v1"
 )
 
+//go:embed dist/*
+var webui embed.FS
+
 type router struct {
-	melody   *melody.Melody
-	wirebird wirebird.Wirebird
+	melody     *melody.Melody
+	wirebird   wirebird.Wirebird
+	fileSystem http.FileSystem
 }
 
 func New(melody *melody.Melody, wirebird wirebird.Wirebird) Router {
@@ -61,4 +67,18 @@ func (r *router) AddEvent(c *gin.Context) {
 
 func (r *router) HandleEventSocket(c *gin.Context) {
 	r.melody.HandleRequest(c.Writer, c.Request)
+}
+
+func (r *router) GetStaticFS() http.FileSystem {
+	if r.fileSystem != nil {
+		return r.fileSystem
+	}
+
+	sub, err := fs.Sub(webui, "dist")
+
+	if err != nil {
+		log.Fatalf("Error getting static files: %s", err.Error())
+	}
+	r.fileSystem = http.FS(sub)
+	return r.fileSystem
 }
